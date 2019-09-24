@@ -161,7 +161,7 @@ parse_prep_bm_host_src "$manifest_dir"
 # shellcheck disable=SC1090
 source "$PROJECT_DIR/scripts/network_conf.sh"
 
-parse_manifests "$manifest_dir"
+gen_variables "$manifest_dir"
 
 case "$COMMAND" in
 create)

@@ -81,6 +81,7 @@ printf "\nConfiguring provisioning interface (%s) and bridge (%s)...\n\n" "$PROV
 
 cat <<EOF >"/etc/sysconfig/network-scripts/ifcfg-$PROV_BRIDGE"
 TYPE=Bridge
+NM_CONTROLLED=no
 PROXY_METHOD=none
 BROWSER_ONLY=no
 BOOTPROTO=static
@@ -97,6 +98,7 @@ EOF
 cat <<EOF >"/etc/sysconfig/network-scripts/ifcfg-$PROV_INTF"
 TYPE=Ethernet
 PROXY_METHOD=none
+NM_CONTROLLED=no
 BROWSER_ONLY=no
 BOOTPROTO=static
 DEFROUTE=yes

@@ -1,8 +1,15 @@
 #!/bin/bash
 if [ -e /tmp/runonce ]; then
+    # shellcheck disable=SC1091
+    source /etc/profile.env
+
     rm /tmp/runonce
 
-    # create registries entry
+    # Make sure SDN interface supplies DNS
+    con=$(nmcli d show "$SDN_INTERFACE" | sed -nre 's/^GENERAL.CONNECTION:\s+(.*)$/\1/p')
+    sudo nmcli con mod "$con" ipv4.dns-priority -1
+    sudo systemctl restart NetworkManager
+
     echo "unqualified-search-registries = ['registry.access.redhat.com', 'docker.io']" > /etc/containers/registries.conf
     systemctl restart cri-o
 

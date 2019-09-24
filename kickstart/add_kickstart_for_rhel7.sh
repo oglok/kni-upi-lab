@@ -34,6 +34,7 @@ cat <<EOF > /etc/profile.env
 export RH_USERNAME="${RH_USERNAME}"
 export RH_PASSWORD="${RH_PASSWORD}"
 export RH_POOL="${RH_POOL}"
+export SDN_INTERFACE="${SITE_CONFIG[provisioningInfrastructure.hosts.defaultSdnInterface]}"
 EOF
 
 # Add core ssh key

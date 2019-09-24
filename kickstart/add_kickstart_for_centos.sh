@@ -29,6 +29,11 @@ firstboot --disable
 user --name=core --groups=wheel
 %post --erroronfail --log=/root/ks-post.log
 
+# write env vars for misc
+cat <<EOF > /etc/profile.env
+export SDN_INTERFACE="${SITE_CONFIG[provisioningInfrastructure.hosts.defaultSdnInterface]}"
+EOF
+
 # Add core ssh key
 mkdir -m0700 /home/core/.ssh
 cat <<EOF > /home/core/.ssh/authorized_keys
