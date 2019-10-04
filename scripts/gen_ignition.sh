@@ -131,12 +131,12 @@ gen_ignition() {
     gen_nm_disable_auto_config "master" || exit 1
     gen_nm_disable_auto_config "worker" || exit 1
 
-#need interfaces...
+    #need interfaces...
 
-    gen_ifcfg_manifest "master"  "$MASTER_BM_INTF"  "yes" || exit 1
-    gen_ifcfg_manifest "master"  "$MASTER_PROV_INTF" "no" || exit 1
-    gen_ifcfg_manifest "worker"  "$WORKER_BM_INTF"  "yes" || exit 1
-    gen_ifcfg_manifest "worker"  "$WORKER_PROV_INTF" "no" || exit 1
+    gen_ifcfg_manifest "master" "$MASTER_BM_INTF" "yes" || exit 1
+    gen_ifcfg_manifest "master" "$MASTER_PROV_INTF" "no" || exit 1
+    gen_ifcfg_manifest "worker" "$WORKER_BM_INTF" "yes" || exit 1
+    gen_ifcfg_manifest "worker" "$WORKER_PROV_INTF" "no" || exit 1
 
     patch_manifest "$out_dir"
 
@@ -150,12 +150,24 @@ gen_ignition() {
     #
     if [ -z "$PATH_NM_WAIT" ]; then
         for ign in bootstrap.ign master.ign worker.ign; do
-            jq '.systemd.units += [{"name": "NetworkManager-wait-online.service", 
-     "dropins": [{ 
-       "name": "timeout.conf", 
-       "contents": "[Service]\nExecStart=\nExecStart=/usr/bin/nm-online -s -q --timeout=300" 
-     }]}]' <"$out_dir/$ign" >"$out_dir/$ign.bak"
-
+            # patch the NetworkManager to allow more time for booting
+            (jq '.systemd.units += 
+            [{ 
+                "name": "NetworkManager-wait-online.service", 
+                "dropins": [{ 
+                            "name": "timeout.conf", 
+                            "contents": "[Service]\nExecStart=\nExecStart=/usr/bin/nm-online -s -q --timeout=300" 
+                           }]
+            }]' |
+                jq '.storage.filesystems += 
+            [ { 
+                "mount": { 
+                    "device": "/dev/disk/by-label/ROOT",
+                    "format": "xfs", 
+                    "wipeFilesystem": true,
+                    "label": "ROOT"
+                } 
+            }]') <"$out_dir/$ign" >"$out_dir/$ign.bak"
             mv "$out_dir/$ign.bak" "$out_dir/$ign"
         done
     fi
